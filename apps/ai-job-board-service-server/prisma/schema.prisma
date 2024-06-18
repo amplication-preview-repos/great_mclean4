@@ -1,0 +1,82 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Report {
+  createdAt   DateTime              @default(now())
+  data        Json?
+  generatedAt DateTime?
+  graph       Json?
+  id          String                @id @default(cuid())
+  reportName  String?
+  reportType  EnumReportReportType?
+  updatedAt   DateTime              @updatedAt
+}
+
+model JobPost {
+  applications Application[]
+  createdAt    DateTime      @default(now())
+  description  String?
+  employer     Employer?     @relation(fields: [employerId], references: [id])
+  employerId   String?
+  id           String        @id @default(cuid())
+  location     String?
+  title        String?
+  updatedAt    DateTime      @updatedAt
+}
+
+model Employer {
+  company   String?
+  createdAt DateTime  @default(now())
+  email     String?
+  id        String    @id @default(cuid())
+  jobPosts  JobPost[]
+  name      String?
+  updatedAt DateTime  @updatedAt
+}
+
+model Applicant {
+  applications Application[]
+  createdAt    DateTime      @default(now())
+  email        String?
+  id           String        @id @default(cuid())
+  name         String?
+  resume       Json?
+  updatedAt    DateTime      @updatedAt
+}
+
+model Application {
+  applicant   Applicant?             @relation(fields: [applicantId], references: [id])
+  applicantId String?
+  createdAt   DateTime               @default(now())
+  id          String                 @id @default(cuid())
+  jobPost     JobPost?               @relation(fields: [jobPostId], references: [id])
+  jobPostId   String?
+  status      EnumApplicationStatus?
+  updatedAt   DateTime               @updatedAt
+}
+
+model User {
+  createdAt DateTime @default(now())
+  email     String?  @unique
+  firstName String?
+  id        String   @id @default(cuid())
+  lastName  String?
+  password  String
+  roles     Json
+  updatedAt DateTime @updatedAt
+  username  String   @unique
+}
+
+enum EnumReportReportType {
+  Option1
+}
+
+enum EnumApplicationStatus {
+  Option1
+}
